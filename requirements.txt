@@ -1,0 +1,10 @@
+accelerate>=0.33
+cryptography>=42
+diffusers>=0.30
+numpy>=1.24
+pillow>=10
+pytest>=8
+reedsolo>=1.7
+safetensors>=0.4
+torch>=2.3
+transformers>=4.43

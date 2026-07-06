@@ -1,0 +1,12 @@
+.venv/
+.agents/
+.codex/
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+outputs/
+LDStega_extracted.txt
+LDStega.pdf
+LDStega_Kaggle.ipynb
+*.zip

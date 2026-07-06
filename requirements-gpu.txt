@@ -1,0 +1,6 @@
+# Install CUDA PyTorch separately for the RTX 3070 first, for example:
+# python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+#
+# Then install the project dependencies:
+-r requirements.txt
+
