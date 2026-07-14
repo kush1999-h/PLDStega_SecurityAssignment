@@ -96,7 +96,8 @@ python -m ldstega.cli hide `
   --embed-method sign `
   --embed-strength 0.02 `
   --dtype float32 `
-  --stabilize-rounds 2
+  --stabilize-rounds 2 `
+  --cpu-offload
 ```
 
 If the command fails with a VAE decode warning or produces a black image, delete
@@ -110,6 +111,11 @@ the VAE and attempting payload recovery. A successful hide prints
 `verified=True`. If verification fails, no output should be trusted. You can
 save unverified images for visual debugging with `--allow-unverified`, but do
 not treat those images as carrying a recoverable message.
+
+For an 8 GB RTX 3070, start with the command above. Avoid first tests with
+`--steps 80`; the verification pass also uses the VAE and can exhaust VRAM.
+If CUDA OOM still occurs, reduce to `--height 512 --width 512`, or set
+`--stabilize-rounds 0` to test generation before verification.
 
 ## PLDStega Promptless Extract
 

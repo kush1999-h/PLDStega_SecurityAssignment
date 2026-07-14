@@ -76,6 +76,12 @@ class PLDStegaEmbedder:
         try:
             return self._hide_once(prompt, message, key, seed, output, negative_prompt)
         except RuntimeError as exc:
+            if self._is_cuda_oom(exc) and not self._should_retry_768(exc):
+                raise RuntimeError(
+                    "CUDA out of memory during PLDStega generation/verification. "
+                    "Retry with --cpu-offload, lower --height/--width to 512, fewer "
+                    "--steps, lower --capacity-bytes, or lower --stabilize-rounds."
+                ) from exc
             if not self._should_retry_768(exc):
                 raise
             self.runtime.torch.cuda.empty_cache()
@@ -287,6 +293,10 @@ class PLDStegaEmbedder:
             return False
         if not hasattr(self.runtime.torch, "cuda") or not self.runtime.torch.cuda.is_available():
             return False
+        return self._is_cuda_oom(exc)
+
+    @staticmethod
+    def _is_cuda_oom(exc: RuntimeError) -> bool:
         return "out of memory" in str(exc).lower()
 
 
