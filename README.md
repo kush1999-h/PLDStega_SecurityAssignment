@@ -95,7 +95,8 @@ python -m ldstega.cli hide `
   --ecc-symbols 32 `
   --embed-method sign `
   --embed-strength 0.02 `
-  --dtype float32
+  --dtype float32 `
+  --stabilize-rounds 2
 ```
 
 If the command fails with a VAE decode warning or produces a black image, delete
@@ -103,6 +104,12 @@ the bad output and retry with `--dtype float32` and a lower embedding strength,
 for example `--embed-strength 0.01`. Do not attempt extraction from a black or
 nearly blank output image. After a normal-looking image is generated and tested,
 you can try `--dtype auto` or a higher embedding strength for speed/tuning.
+
+By default, `pldstega hide` verifies the saved image by re-encoding it through
+the VAE and attempting payload recovery. A successful hide prints
+`verified=True`. If verification fails, no output should be trusted. You can
+save unverified images for visual debugging with `--allow-unverified`, but do
+not treat those images as carrying a recoverable message.
 
 ## PLDStega Promptless Extract
 

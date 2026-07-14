@@ -104,6 +104,8 @@ def _run_pldstega(args) -> int:
             dtype=args.dtype,
             enable_cpu_offload=args.cpu_offload,
             allow_size_fallback=args.allow_size_fallback,
+            stabilize_rounds=args.stabilize_rounds,
+            verify_after_hide=not args.allow_unverified,
         )
         result = PLDStegaEmbedder(config).hide(
             prompt=args.prompt,
@@ -115,6 +117,7 @@ def _run_pldstega(args) -> int:
         )
         print(f"wrote {result['output']}")
         print(f"embedded_bits={result['embedded_bits']} capacity_bits={result['capacity_bits']}")
+        print(f"verified={bool(result.get('verified', 0))}")
         return 0
 
     from .promptless_extract import PLDStegaExtractConfig, PLDStegaExtractor
@@ -171,6 +174,8 @@ def _add_common(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--embed-method", choices=["sign", "qim"], default="sign")
     parser.add_argument("--embed-strength", type=float, default=0.03)
     parser.add_argument("--qim-step", type=float, default=0.1)
+    parser.add_argument("--stabilize-rounds", type=int, default=2)
+    parser.add_argument("--allow-unverified", action="store_true")
     parser.add_argument("--cpu-offload", action="store_true")
     parser.add_argument("--full-pipeline-extract", action="store_true")
     return parser
