@@ -94,13 +94,15 @@ python -m ldstega.cli hide `
   --repeat 3 `
   --ecc-symbols 32 `
   --embed-method sign `
-  --embed-strength 0.05
+  --embed-strength 0.02 `
+  --dtype float32
 ```
 
 If the command fails with a VAE decode warning or produces a black image, delete
 the bad output and retry with `--dtype float32` and a lower embedding strength,
-for example `--embed-strength 0.02`. Do not attempt extraction from a black or
-nearly blank output image.
+for example `--embed-strength 0.01`. Do not attempt extraction from a black or
+nearly blank output image. After a normal-looking image is generated and tested,
+you can try `--dtype auto` or a higher embedding strength for speed/tuning.
 
 ## PLDStega Promptless Extract
 
@@ -117,7 +119,8 @@ python -m ldstega.cli extract `
   --group-size 5 `
   --repeat 3 `
   --ecc-symbols 32 `
-  --embed-method sign
+  --embed-method sign `
+  --dtype float32
 ```
 
 The decoding parameters must match the hide parameters.
@@ -153,7 +156,7 @@ Run locally:
 
 ```powershell
 python -m unittest discover -s tests -v
-python -m py_compile ldstega\*.py ldstega\baselines\*.py
+python -c "import compileall, sys; sys.exit(0 if compileall.compile_dir('ldstega', quiet=1) else 1)"
 ```
 
 These tests do not run SDXL generation.
