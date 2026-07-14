@@ -37,6 +37,7 @@ class VAERuntime:
         return device, dtype
 
     def _load_vae(self):
+        torch = self.torch
         from diffusers import AutoencoderKL
 
         vae = AutoencoderKL.from_pretrained(
@@ -44,10 +45,11 @@ class VAERuntime:
             subfolder="vae",
             torch_dtype=self.dtype,
         )
+        if getattr(vae.config, "force_upcast", False):
+            vae.to(dtype=torch.float32)
         vae = vae.to(self.device)
         if hasattr(vae, "enable_slicing"):
             vae.enable_slicing()
         if hasattr(vae, "enable_tiling"):
             vae.enable_tiling()
         return vae
-

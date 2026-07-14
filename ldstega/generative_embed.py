@@ -195,8 +195,17 @@ class PLDStegaEmbedder:
 
     def _decode(self, latents):
         pipe = self.runtime.pipe
+        torch = self.runtime.torch
+        if not torch.isfinite(latents).all():
+            raise RuntimeError("non-finite diffusion latents before VAE decode")
         scaling = getattr(pipe.vae.config, "scaling_factor", 0.13025)
-        image = pipe.vae.decode(latents / scaling).sample
+        decode_latents = (latents / scaling).to(dtype=pipe.vae.dtype)
+        image = pipe.vae.decode(decode_latents).sample
+        if not torch.isfinite(image).all():
+            raise RuntimeError(
+                "VAE decode produced non-finite pixels; try --dtype float32, "
+                "lower --guidance-scale, or lower --embed-strength"
+            )
         image = (image / 2 + 0.5).clamp(0, 1)
         image = image.detach().cpu().permute(0, 2, 3, 1).float().numpy()[0]
         from PIL import Image

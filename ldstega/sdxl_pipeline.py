@@ -54,6 +54,8 @@ class SDXLPipelineRuntime:
         from diffusers import StableDiffusionXLPipeline
 
         pipe = StableDiffusionXLPipeline.from_pretrained(self.config.model_id, torch_dtype=self.dtype)
+        if getattr(pipe.vae.config, "force_upcast", False):
+            pipe.vae.to(dtype=self.torch.float32)
         if self.config.enable_cpu_offload and self.device == "cuda" and hasattr(pipe, "enable_model_cpu_offload"):
             pipe.enable_model_cpu_offload()
         else:
