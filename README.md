@@ -62,9 +62,14 @@ python -m pip install -r requirements.txt
 On the RTX 3070 machine, install CUDA PyTorch first:
 
 ```powershell
-python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+python -m pip install --upgrade pip
+python -m pip install --force-reinstall torch torchvision --index-url https://download.pytorch.org/whl/cu121
 python -m pip install -r requirements-gpu.txt
 ```
+
+The dependency versions are pinned because this prototype was stabilized
+against a specific PyTorch/Diffusers/Transformers stack. Avoid installing the
+latest unpinned Diffusers or Transformers for the smoke test.
 
 ## PLDStega Hide
 
@@ -91,6 +96,11 @@ python -m ldstega.cli hide `
   --embed-method sign `
   --embed-strength 0.05
 ```
+
+If the command fails with a VAE decode warning or produces a black image, delete
+the bad output and retry with `--dtype float32` and a lower embedding strength,
+for example `--embed-strength 0.02`. Do not attempt extraction from a black or
+nearly blank output image.
 
 ## PLDStega Promptless Extract
 
@@ -192,4 +202,3 @@ Recommended wording:
 - `posthoc-vae-qim` is reserved but not implemented.
 - PLDStega is experimental and may need tuning of capacity, group size,
   repetition, ECC symbols, and embedding strength.
-

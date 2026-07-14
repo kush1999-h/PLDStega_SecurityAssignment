@@ -207,6 +207,11 @@ class PLDStegaEmbedder:
                 "lower --guidance-scale, or lower --embed-strength"
             )
         image = (image / 2 + 0.5).clamp(0, 1)
+        if (image.max() - image.min()).item() < 1e-4:
+            raise RuntimeError(
+                "VAE decode produced a nearly constant image; delete this output and retry "
+                "with --dtype float32, lower --guidance-scale, or lower --embed-strength"
+            )
         image = image.detach().cpu().permute(0, 2, 3, 1).float().numpy()[0]
         from PIL import Image
 
