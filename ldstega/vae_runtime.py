@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .sdxl_pipeline import DEFAULT_SDXL_MODEL, _import_torch
+from .sdxl_pipeline import DEFAULT_SDXL_MODEL, _from_pretrained_with_fp16_variant, _import_torch
 
 
 @dataclass(frozen=True)
@@ -40,10 +40,12 @@ class VAERuntime:
         torch = self.torch
         from diffusers import AutoencoderKL
 
-        vae = AutoencoderKL.from_pretrained(
+        vae = _from_pretrained_with_fp16_variant(
+            AutoencoderKL,
             self.config.model_id,
+            self.dtype,
+            torch,
             subfolder="vae",
-            torch_dtype=self.dtype,
         )
         if getattr(vae.config, "force_upcast", False):
             vae.to(dtype=torch.float32)

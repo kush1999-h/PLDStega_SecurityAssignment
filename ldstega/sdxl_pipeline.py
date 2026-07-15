@@ -53,7 +53,12 @@ class SDXLPipelineRuntime:
     def _load_pipeline(self):
         from diffusers import StableDiffusionXLPipeline
 
-        pipe = StableDiffusionXLPipeline.from_pretrained(self.config.model_id, torch_dtype=self.dtype)
+        pipe = _from_pretrained_with_fp16_variant(
+            StableDiffusionXLPipeline,
+            self.config.model_id,
+            self.dtype,
+            self.torch,
+        )
         if getattr(pipe.vae.config, "force_upcast", False):
             pipe.vae.to(dtype=self.torch.float32)
         if self.config.enable_cpu_offload and self.device == "cuda" and hasattr(pipe, "enable_model_cpu_offload"):
@@ -76,3 +81,19 @@ def _import_torch():
     except ImportError as exc:
         raise RuntimeError("PyTorch is required for SDXL PLDStega") from exc
     return torch
+
+
+def _from_pretrained_with_fp16_variant(loader, model_id: str, dtype, torch, **kwargs):
+    """Load SDXL repos that store weights as either normal or fp16 variants."""
+    if dtype is torch.float16:
+        try:
+            return loader.from_pretrained(
+                model_id,
+                torch_dtype=dtype,
+                variant="fp16",
+                use_safetensors=True,
+                **kwargs,
+            )
+        except (OSError, ValueError):
+            pass
+    return loader.from_pretrained(model_id, torch_dtype=dtype, **kwargs)
